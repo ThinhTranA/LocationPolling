@@ -40,7 +40,9 @@
 	<string>Need location while using</string>
 	<key>UIBackgroundModes</key>
 	<array>
-		<string>location</string>
+		<string>audio</string>
 	</array>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>need location always usage description</string>
 </dict>
 </plist>

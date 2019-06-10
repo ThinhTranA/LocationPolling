@@ -6,9 +6,22 @@
         <Label Text="{Binding Location.Longitude, StringFormat= 'Longitude: {0}'}"/>
         <Label Text="{Binding Location.Altitude, StringFormat= 'Altitude: {0}'}"/>
         
-        <Label Text="{Binding DistanceInMeters, StringFormat= 'Distance In Meter: {0}'}"/>
+        <Label Margin="0,20,0,0" HorizontalOptions="CenterAndExpand" FontSize="30"
+               Text="Distance In Meter"/>
+         <Label Margin="0,0,0,0" HorizontalOptions="CenterAndExpand" FontSize="30"
+               Text="From 140 William Str"/>
+        <Label Margin="0,0,0,0" HorizontalOptions="CenterAndExpand" FontSize="50"
+               Text="{Binding DistanceInMeters, StringFormat= '{0} m'}"/>
         
         
-        <Button Text="Refresh location" Padding="20" Command="{Binding GetLocationCommand}"/>
+        <Button Text="Start Tracking" Padding="20" Command="{Binding GetLocationCommand}"/>
+        
+        <Label Margin="0,50,0,0" HorizontalOptions="CenterAndExpand" FontSize="20"
+               Text="Buzz range:"/>
+        <Label Margin="0,0,0,0" HorizontalOptions="CenterAndExpand" FontSize="30"
+               Text="{Binding MinDistance, StringFormat= 'From {0} m'}"/>
+        <Label Margin="0,0,0,0" HorizontalOptions="CenterAndExpand" FontSize="30"
+               Text="{Binding MaxDistance, StringFormat= 'To {0} m'}"/>
+        
     </StackLayout>
 </ContentPage>

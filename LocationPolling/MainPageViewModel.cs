@@ -4,6 +4,7 @@ using Xamarin.Forms;
 using Xamarin.Essentials;
 using MvvmHelpers;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace LocationPolling
 {
@@ -16,12 +17,15 @@ namespace LocationPolling
             set { SetProperty(ref _location, value); }
         }
 
-        double _distanceInMeters;
-        public double DistanceInMeters
+        int _distanceInMeters;
+        public int DistanceInMeters
         {
             get { return _distanceInMeters; }
             set { SetProperty(ref _distanceInMeters, value); }
         }
+
+        public int MinDistance { get; set; }
+        public int MaxDistance { get; set; }
 
         public Command GetLocationCommand { get; set; }
 
@@ -30,15 +34,18 @@ namespace LocationPolling
 
         public MainPageViewModel()
         {
+            MinDistance = 100; //m
+            MaxDistance = 120;
+
             GetLocationCommand = new Command(async () => await ExecuteGetLocationCommandAsync());
             GetLocationCommand.Execute(null);
         }
 
         async Task ExecuteGetLocationCommandAsync()
         {
-            Location = await GetLocation();
-            DistanceInMeters = Location.CalculateDistance(Location, office140William, DistanceUnits.Kilometers) * 1000;
-          //  await UpdateLocationAsyncInfiniteLoop();
+            //Location = await GetLocation();
+            //DistanceInMeters = Location.CalculateDistance(Location, office140William, DistanceUnits.Kilometers) * 1000;
+            await UpdateLocationAsyncInfiniteLoop();
         }
 
         async Task UpdateLocationAsyncInfiniteLoop()
@@ -46,8 +53,14 @@ namespace LocationPolling
             while (true)
             {
                 Location = await GetLocation();
-                DistanceInMeters = Location.CalculateDistance(Location, office140William, DistanceUnits.Kilometers) * 1000;
-                await Task.Delay(500);
+                var distanceInMeters = Location.CalculateDistance(Location, office140William, DistanceUnits.Kilometers) * 1000;
+                DistanceInMeters = Convert.ToInt32(distanceInMeters);
+                if(Enumerable.Range(MinDistance,MaxDistance).Contains(DistanceInMeters))
+                {
+                    AlertPhone();
+                }
+
+                await Task.Delay(1000);
             }
         }
 
@@ -56,7 +69,8 @@ namespace LocationPolling
         {
             try
             {
-                var location = await Geolocation.GetLastKnownLocationAsync();
+              //  var location = await Geolocation.GetLastKnownLocationAsync();
+                var location = await Geolocation.GetLocationAsync();
 
                 if (location != null)
                 {
@@ -83,6 +97,34 @@ namespace LocationPolling
             }
 
             return null;
+        }
+
+        void AlertPhone()
+        {
+            if (IsBusy)
+                return;
+
+            try
+            {
+                IsBusy = true;
+                // Use default vibration length
+                Vibration.Vibrate();
+
+                // Or use specified time
+                var duration = TimeSpan.FromSeconds(5);
+                Vibration.Vibrate(duration);
+                
+            }
+            catch (FeatureNotSupportedException ex)
+            {
+                // Feature not supported on device
+            }
+            catch (Exception ex)
+            {
+                // Other error has occurred.
+            }
+
+            IsBusy = false;
         }
     }
 }
