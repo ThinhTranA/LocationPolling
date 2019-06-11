@@ -24,21 +24,47 @@ namespace LocationPolling
             set { SetProperty(ref _distanceInMeters, value); }
         }
 
-        public int MinDistance { get; set; }
-        public int MaxDistance { get; set; }
+        int _minDistance;
+        public int MinDistance 
+        {
+            get { return _minDistance; }
+            set { SetProperty(ref _minDistance, value); } 
+         }
+        int _maxDistance;
+        public int MaxDistance
+        {
+            get { return _maxDistance; }
+            set { SetProperty(ref _maxDistance, value); }
+        }
+        int _steppingRange;
+        public int SteppingRange
+        {
+            get { return _steppingRange; }
+            set { SetProperty(ref _steppingRange, value); }
+        }
 
         public Command GetLocationCommand { get; set; }
+        public Command SendPostRequestCommand { get; set; }
 
 
         Location office140William = new Location {Latitude = -31.9510955810547, Longitude = 115.858526164014, Altitude = 14.9981451034546 };
+        AppService appService = new AppService();
 
         public MainPageViewModel()
         {
             MinDistance = 100; //m
             MaxDistance = 120;
+            SteppingRange = 10;
 
             GetLocationCommand = new Command(async () => await ExecuteGetLocationCommandAsync());
+            SendPostRequestCommand = new Command(async () => await ExecuteSendPostRequestCommandAsync());
             GetLocationCommand.Execute(null);
+        }
+
+        private async Task ExecuteSendPostRequestCommandAsync()
+        {
+            string reponse = await appService.RestartVMs();
+            await Application.Current.MainPage.DisplayAlert("Status", reponse, "OK");
         }
 
         async Task ExecuteGetLocationCommandAsync()
